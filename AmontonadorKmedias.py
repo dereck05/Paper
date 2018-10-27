@@ -33,8 +33,7 @@ class AmontonadorKmedias:
         
         deltaX = numpy.linalg.norm(self.puntoMaximoX - self.puntoMenorX);
         deltaY = numpy.linalg.norm(self.puntoMaximoY - self.puntoMenorY);
-        print("DeltaX: ", deltaX)
-        print("DeltaY: ", deltaY)
+        
         
     
         
@@ -140,7 +139,7 @@ class AmontonadorKmedias:
                 
                 
         self.setMatrizPesos(resultado)
-        print(resultado)
+        
         
     def amontonarK(self, K):
         
@@ -161,8 +160,7 @@ class AmontonadorKmedias:
 
     def recalcularKmedias(self):
         acumuladorK = [[] for i in range(self.__K)]
-        X = self.__X
-        pesos = self.__matrizPesos
+        
         for i in range(0, self.__N): #verifica con la lista de pesos
             for j in range(0 , self.__K):
                 if (self.__matrizPesos[ i, j ] == 1):
@@ -171,10 +169,16 @@ class AmontonadorKmedias:
                     #mediaNueva = self.promediarListaParesOrdenados(acumuladorK)
                     
         
-        #print(acumuladorK[0][0])         
+              
         mediasNuevas = self.promediarListaParesOrdenados(acumuladorK) #Falta agregar la excepcion cuando es 0/0
-        print(mediasNuevas)
-        self.setCentroides(mediasNuevas)
+        
+        matrizNuevaCentroides = numpy.zeros((2 , self.__K));
+        for i in range(0, self.__K):
+            
+            matrizNuevaCentroides[0, i] = mediasNuevas[i][0];
+            matrizNuevaCentroides[1, i] = mediasNuevas[i][1];
+        
+        self.setCentroides(matrizNuevaCentroides)
         
         #print("Recalculo Centroides:",[mediaNuevaX ,mediaNuevaY])
         
@@ -183,15 +187,20 @@ class AmontonadorKmedias:
         acumuladorX = 0   #usa acumuladores para separar X con Y
         acumuladorY = 0
         centroidesNuevos = []
-        
+        cont = 0
         for i in lista: 
-            for j in lista:
-                acumuladorX += lista[i,j][0]
-                acumuladorY += lista[i,j][1]
-                
-            promedioX = acumuladorX / j  #promedia X y Y
-            promedioY= acumuladorY / j
-            centroidesNuevos+= [promedioX,promedioY]    
+            for j in i :
+               
+                    
+                acumuladorX += j[0]
+                acumuladorY += j[1]
+                cont+=1
+            promedioX = acumuladorX / cont  #promedia X y Y
+            promedioY= acumuladorY / cont
+            centroidesNuevos+= [[promedioX,promedioY] ]
+            cont =0
+            acumuladorX = 0   #usa acumuladores para separar X con Y
+            acumuladorY = 0
         
         
         return centroidesNuevos
@@ -209,7 +218,7 @@ def principal():
     
     Y = AmontonadorKmedias(K, matrizXc1);
  
-    
+    '''
     centroides = AmontonadorKmedias.getCentroides(Y)
     plt.plot(centroides[0, :], centroides[1, :], "o")
     etiquetas = Y.etiquetar()
@@ -219,7 +228,33 @@ def principal():
     #amontonadoCentroide2 = Y.amontonarK(1)
     #plt.show()
     #print("Etiquetas: ", etiquetas)
+    '''
+    centroides = AmontonadorKmedias.getCentroides(Y)
+    #Grafico los centroides
     
+    #Realizo la fase de etiquetado
+    Y.etiquetar()
+    
+    #Se grafican las líneas que unen los puntos con los centroides
+    amontonadoCentroide1 = Y.amontonarK(K)
+    
+    plt.plot(centroides[:, 0], centroides[:, 1], "y", marker = "o", ls="--", label = "Centroide original")
+    #Muestro el gráfico
+    plt.show()
+    '''
+    """Iteración 2:"""
+    #Recalculo los centroidesw
+    Y.recalcularKmedias()
+    #Reasigno las etiquetas
+    Y.etiquetar()
+    centroides = AmontonadorKmedias.getCentroides(Y)
+    
+    #Grafica las líneas que unen los puntos con los centroides
+    amontonadoCentroide1 = Y.amontonarK(K)
+    plt.plot([centroides[0][0], centroides[1][0]], [centroides[0][1], centroides[1][1]], "red", marker="o", ls="--", label = "Centroide Nuevo")
+    plt.legend(loc="upper left")
+    plt.show()
+   '''
     
 principal()
         

@@ -43,7 +43,7 @@ class AmontonadorKmedias:
         
         #Inicializa aleatoriamente los centroides
         for i in range(0, K):
-            puntoAleatorio = self.__generadorDatos.generarPuntoAleatorio(self.puntoMenorX - 10, self.puntoMaximoX + 10, self.puntoMenorY - 10, self.puntoMaximoY + 10);
+            puntoAleatorio = self.__generadorDatos.generarPuntoAleatorio(self.puntoMenorX - 5, self.puntoMaximoX + 5, self.puntoMenorY - 5, self.puntoMaximoY + 5);
             self.__matrizCentroides[0, i] = puntoAleatorio[0];
             self.__matrizCentroides[1, i] = puntoAleatorio[1];
         
@@ -140,70 +140,70 @@ class AmontonadorKmedias:
                 
                 
         self.setMatrizPesos(resultado)
+        print(resultado)
         
     def amontonarK(self, K):
+        
         etiquetas = self.__matrizPesos
         for i in range (0, self.__N):
-            if (etiquetas[i, K] == 1):
-                #Adjunto el dato correspondiente al centroide en X y en Y
-                datosx = [self.__matrizCentroides[0, 0]] + [self.__X[0, i]]
-                datosy = [self.__matrizCentroides[0, 1]] + [self.__X[1, i]]
-                
-                #Añado las líneas con los puntos al plot
-            else:
-                datosx = [self.__matrizCentroides[1, 0]] + [self.__X[0, i]]
-                datosy = [self.__matrizCentroides[1, 1]] + [self.__X[1, i]]
-                
-            plt.plot(datosx, datosy, marker="o")
+            for j in range(0 , self.__K):
+                if (etiquetas[i, j] == 1):
+                    #Adjunto el dato correspondiente al centroide en X y en Y
+                    datosx = [self.__matrizCentroides[0 , j]] + [self.__X[0, i]]
+                    
+                    datosy = [self.__matrizCentroides[1, j]] + [self.__X[1, i]]
+                    
+                    plt.plot(datosx, datosy, marker="o")
+                    
         
-'''
-    def etiquetar(self):
-        resultado = self.__matrizPesos
+         
         
-        contadorIndices = 0   #contador para colocar bien el resultado en la matriz pesos
-        distancia1 = 0    #acumulador distancia 1
-        distancia2 = 0    #acumulador distancia 2
+
+    def recalcularKmedias(self):
+        acumuladorK = [[] for i in range(self.__K)]
+        X = self.__X
+        pesos = self.__matrizPesos
+        for i in range(0, self.__N): #verifica con la lista de pesos
+            for j in range(0 , self.__K):
+                if (self.__matrizPesos[ i, j ] == 1):
+                    valor = [self.__X[0][i] , self.__X[1][i]]
+                    acumuladorK[j] += [valor] #Separa cada par, de acuerdo a su cercania a un centroide
+                    #mediaNueva = self.promediarListaParesOrdenados(acumuladorK)
+                    
         
-        for i in range(0, self.__N):
-            parOrdenado= [self.__X[0, i], self.__X[1, i]]
-            print("pba:",parOrdenado)
-            distancia1 = numpy.linalg.norm(parOrdenado - self.puntoMenor)#Ambos parametros suponen un par ordenado
-            distancia2 = numpy.linalg.norm(parOrdenado - self.puntoMax)
-            valor = 1
-            if (distancia1 < distancia2):   #Ponemos 1 si es el elemento mas cercano a etiqueta 1
-                resultado[contadorIndices, 0] = valor
-                contadorIndices += 1
-            else:
-                #Sino ponemos 1 a etiqueta 2
-                resultado[contadorIndices, 1] = valor
-                contadorIndices += 1
+        #print(acumuladorK[0][0])         
+        mediasNuevas = self.promediarListaParesOrdenados(acumuladorK) #Falta agregar la excepcion cuando es 0/0
+        print(mediasNuevas)
+        self.setCentroides(mediasNuevas)
+        
+        #print("Recalculo Centroides:",[mediaNuevaX ,mediaNuevaY])
+        
+        
+    def promediarListaParesOrdenados(self, lista): #Promedia las X con ellas mismas y las Y tambien
+        acumuladorX = 0   #usa acumuladores para separar X con Y
+        acumuladorY = 0
+        centroidesNuevos = []
+        
+        for i in lista: 
+            for j in lista:
+                acumuladorX += lista[i,j][0]
+                acumuladorY += lista[i,j][1]
                 
-       
-            
-        return resultado
-'''
-'''
-    def amontonarK(self, K):
-        etiquetas = self.__matrizPesos
-        for i in range (0, self.__N):
-            if (etiquetas[i, K] == 0):
-                #Adjunto el dato correspondiente al centroide en X y en Y
-                datosx = [self.__matrizCentroides[0, 0]] + [self.__X[0, i]]
-                datosy = [self.__matrizCentroides[0, 1]] + [self.__X[1, i]]
-                #Añado las líneas con los puntos al plot
-            else:
-                datosx = [self.__matrizCentroides[1, 0]] + [self.__X[0, i]]
-                datosy = [self.__matrizCentroides[1, 1]] + [self.__X[1, i]]
-            plt.plot(datosx, datosy, marker="o")
+            promedioX = acumuladorX / j  #promedia X y Y
+            promedioY= acumuladorY / j
+            centroidesNuevos+= [promedioX,promedioY]    
+        
+        
+        return centroidesNuevos
                 
-'''  
+
     
 def principal():
     K = 4;
     graficador = Graficador();
     generadorDatos = GeneradorDatos();
     
-    N = 100; #cantidad de datos
+    N = 20; #cantidad de datos
     matrizXc1 = generadorDatos.generarDatosGauss2D(28, 3, 20, 10, N);
     graficador.graficarPuntos(matrizXc1);
     
@@ -213,6 +213,8 @@ def principal():
     centroides = AmontonadorKmedias.getCentroides(Y)
     plt.plot(centroides[0, :], centroides[1, :], "o")
     etiquetas = Y.etiquetar()
+    Y.amontonarK(K);
+    Y.recalcularKmedias()
     #amontonadoCentroide1 = Y.amontonarK(0)
     #amontonadoCentroide2 = Y.amontonarK(1)
     #plt.show()

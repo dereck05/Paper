@@ -23,13 +23,14 @@ class AmontonadorKmedias:
         self.__N = len(X[0])
         
         self.puntoMenorX = self.minimoX();
-        print("Punto menorX: ", self.puntoMenorX)
+        #print("Punto menorX: ", self.puntoMenorX)
         self.puntoMaximoX = self.maximoX();
-        print("Punto maximoX: ", self.puntoMaximoX )
+        #print("Punto maximoX: ", self.puntoMaximoX )
         self.puntoMenorY = self.minimoY();
-        print("Punto menorY: ", self.puntoMenorY )
+        #print("Punto menorY: ", self.puntoMenorY )
         self.puntoMaximoY = self.maximoY();
-        print("Punto maximoY: ", self.puntoMaximoY)
+        #print("Punto maximoY: ", self.puntoMaximoY)
+        self.__col = ["b","g","r","c","m","y","k"]
         
         deltaX = numpy.linalg.norm(self.puntoMaximoX - self.puntoMenorX);
         deltaY = numpy.linalg.norm(self.puntoMaximoY - self.puntoMenorY);
@@ -152,7 +153,7 @@ class AmontonadorKmedias:
                     
                     datosy = [self.__matrizCentroides[1, j]] + [self.__X[1, i]]
                     
-                    plt.plot(datosx, datosy, marker="o")
+                    plt.plot(datosx, datosy, marker="o", color = self.__col[j])
                     
         
          
@@ -204,57 +205,60 @@ class AmontonadorKmedias:
         
         
         return centroidesNuevos
-                
-
+    
+    def iteradorKmeans(self, Y , iteraciones):
+        cont = 0
+        
+        centroides = AmontonadorKmedias.getCentroides(Y)
+        #Grafico los centroides
+    
+        #Realizo la fase de etiquetado
+        Y.etiquetar()
+    
+        #Se grafican las líneas que unen los puntos con los centroides
+        amontonadoCentroide1 = Y.amontonarK(self.__K)
+        for i in range(0, self.__K):
+            plt.plot(centroides[0 , i], centroides[1 , i], marker = "s", color = self.__col[i], ls=" ")
+            #Muestro el gráfico
+        plt.show()
+        
+        while(cont < iteraciones):
+            Y.recalcularKmedias()
+            centroides = AmontonadorKmedias.getCentroides(Y)
+            #Grafico los centroides
+        
+            #Realizo la fase de etiquetado
+            Y.etiquetar()
+        
+            #Se grafican las líneas que unen los puntos con los centroides
+            amontonadoCentroide1 = Y.amontonarK(self.__K)
+            for i in range(0, self.__K):
+                plt.plot(centroides[0 , i], centroides[1 , i], marker = "s", color = self.__col[i], ls=" ")
+                #Muestro el gráfico
+            plt.show()
+            cont+=1
     
 def principal():
-    K = 4;
+    
+    ############################## Cambiar parametros aqui para probarlo    Warning: puede dar error de zero division, solo vuelvalo a correr
+    K = 5;  #cantidad de K-means
+    N = 200; #cantidad de datos
+    
+    #############################
+    
+    
+    
+    ################################ Cuidado al tocar de aqui hacia abajo
     graficador = Graficador();
     generadorDatos = GeneradorDatos();
     
-    N = 20; #cantidad de datos
+    
     matrizXc1 = generadorDatos.generarDatosGauss2D(28, 3, 20, 10, N);
     graficador.graficarPuntos(matrizXc1);
     
     Y = AmontonadorKmedias(K, matrizXc1);
- 
-    '''
-    centroides = AmontonadorKmedias.getCentroides(Y)
-    plt.plot(centroides[0, :], centroides[1, :], "o")
-    etiquetas = Y.etiquetar()
-    Y.amontonarK(K);
-    Y.recalcularKmedias()
-    #amontonadoCentroide1 = Y.amontonarK(0)
-    #amontonadoCentroide2 = Y.amontonarK(1)
-    #plt.show()
-    #print("Etiquetas: ", etiquetas)
-    '''
-    centroides = AmontonadorKmedias.getCentroides(Y)
-    #Grafico los centroides
+    Y.iteradorKmeans(Y, 3)
     
-    #Realizo la fase de etiquetado
-    Y.etiquetar()
-    
-    #Se grafican las líneas que unen los puntos con los centroides
-    amontonadoCentroide1 = Y.amontonarK(K)
-    
-    plt.plot(centroides[:, 0], centroides[:, 1], "y", marker = "o", ls="--", label = "Centroide original")
-    #Muestro el gráfico
-    plt.show()
-    '''
-    """Iteración 2:"""
-    #Recalculo los centroidesw
-    Y.recalcularKmedias()
-    #Reasigno las etiquetas
-    Y.etiquetar()
-    centroides = AmontonadorKmedias.getCentroides(Y)
-    
-    #Grafica las líneas que unen los puntos con los centroides
-    amontonadoCentroide1 = Y.amontonarK(K)
-    plt.plot([centroides[0][0], centroides[1][0]], [centroides[0][1], centroides[1][1]], "red", marker="o", ls="--", label = "Centroide Nuevo")
-    plt.legend(loc="upper left")
-    plt.show()
-   '''
     
 principal()
         

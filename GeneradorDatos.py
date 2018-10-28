@@ -35,26 +35,3 @@ class GeneradorDatos:
         punto2D[0, :] = numpy.random.uniform(min1, max1, 1);
         punto2D[1, :] = numpy.random.uniform(min2, max2, 1);
         return punto2D;
-"""
-def prueba1():
-    generadorDatos = GeneradorDatos();
-    graficador = Graficador();
-    #Se generan los datos aleatoriamente para la primer clase
-    N = 500; #cantidad de datos
-    matrizXc1 = generadorDatos.generarDatosGauss2D(28, 3, 20, 10, N);
-    print(matrizXc1);  
-    graficador.graficarPuntos(matrizXc1);
-
-def principal():
-    K = 2;
-    graficador = Graficador();
-    generadorDatos = GeneradorDatos();
-    N = 30; #cantidad de datos
-    matrizXc1 = generadorDatos.generarDatosGauss2D(200, 3, 330, 10, N);
-    #print(matrizXc1);
-    #graficador.graficarPuntos(matrizXc1);
-    amontonador = Amontonador(2,matrizXc1)
-    amontonador.__escogerPuntoMinimoX();
-
-principal();
-"""

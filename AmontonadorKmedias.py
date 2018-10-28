@@ -4,8 +4,9 @@ Created on Fri Nov  3 11:02:27 2017
 
 
 """
-
-
+import time
+import os
+from datetime import datetime
 import numpy
 from GeneradorDatos import GeneradorDatos
 import matplotlib.pyplot as plt
@@ -30,7 +31,7 @@ class AmontonadorKmedias:
         #print("Punto menorY: ", self.puntoMenorY )
         self.puntoMaximoY = self.maximoY();
         #print("Punto maximoY: ", self.puntoMaximoY)
-        self.__col = ["b","g","r","c","m","y","k"]
+        self.__col = ["r","g","b","c","m","y","k"]
         
         deltaX = numpy.linalg.norm(self.puntoMaximoX - self.puntoMenorX);
         deltaY = numpy.linalg.norm(self.puntoMaximoY - self.puntoMenorY);
@@ -153,7 +154,7 @@ class AmontonadorKmedias:
                     
                     datosy = [self.__matrizCentroides[1, j]] + [self.__X[1, i]]
                     
-                    plt.plot(datosx, datosy, marker="o", color = self.__col[j])
+                    plt.plot(datosx, datosy, marker="o", color = self.__col[j], ls = " ")
                     
         
          
@@ -207,6 +208,23 @@ class AmontonadorKmedias:
         return centroidesNuevos
     
     def iteradorKmeans(self, Y , iteraciones):
+        #Encuentro el directorio en el que se está trabajando actualmente
+        ruta = os.getcwd()
+    
+    
+        #Consigo el tiempo
+        tiempo = datetime.now()
+        #Le asigno el nombre a la carpeta
+        nombreCarpeta = "%s_%s_%s_%s_%s_%s" % (tiempo.day, tiempo.month, tiempo.year, tiempo.hour, tiempo.minute, tiempo.second)
+        #Junto la ruta actual con el nombre de la carpeta
+        ruta = os.path.join(ruta, nombreCarpeta)
+        #Convierto el nombre a un string
+        x = str(ruta)
+        #Creo la carpeta si no existe
+        if not os.path.exists(x):
+            os.makedirs(x)
+
+        
         cont = 0
         
         centroides = AmontonadorKmedias.getCentroides(Y)
@@ -218,9 +236,17 @@ class AmontonadorKmedias:
         #Se grafican las líneas que unen los puntos con los centroides
         amontonadoCentroide1 = Y.amontonarK(self.__K)
         for i in range(0, self.__K):
-            plt.plot(centroides[0 , i], centroides[1 , i], marker = "s", color = self.__col[i], ls=" ")
+            plt.plot(centroides[0 , i], centroides[1 , i], marker = "s",markeredgecolor = "k", markeredgewidth = 2,color = self.__col[i], ls=" ")
             #Muestro el gráfico
-        plt.show()
+        #Busco el segundo actual
+        tiempo = time.strftime("%S")
+        #Le asigno un nombre con extensión jpg a la imagen de resultado
+        rutaPrimera = os.path.join(x, "resultado" + str(tiempo) + ".jpg")
+        #Salvo el gráfico como imagen
+        plt.savefig(rutaPrimera)
+        
+        #Cierro el plot
+        plt.close()
         
         while(cont < iteraciones):
             Y.recalcularKmedias()
@@ -233,16 +259,24 @@ class AmontonadorKmedias:
             #Se grafican las líneas que unen los puntos con los centroides
             amontonadoCentroide1 = Y.amontonarK(self.__K)
             for i in range(0, self.__K):
-                plt.plot(centroides[0 , i], centroides[1 , i], marker = "s", color = self.__col[i], ls=" ")
+                plt.plot(centroides[0 , i], centroides[1 , i], marker = 's', markeredgecolor = "k",markeredgewidth = 2,color = self.__col[i], ls=" ")
                 #Muestro el gráfico
-            plt.show()
+            #Busco el segundo actual
+            tiempo = time.strftime("%S")
+            #Le asigno un nombre con extensión jpg a la imagen de resultado
+            rutaPrimera = os.path.join(x, "resultado" + str(tiempo) + ".jpg")
+            #Salvo el gráfico como imagen
+            plt.savefig(rutaPrimera)
+            
+            #Cierro el plot
+            plt.close()
             cont+=1
     
 def principal():
     
     ############################## Cambiar parametros aqui para probarlo    Warning: puede dar error de zero division, solo vuelvalo a correr
-    K = 5;  #cantidad de K-means
-    N = 200; #cantidad de datos
+    K = 3;  #cantidad de K-means
+    N = 400; #cantidad de datos
     
     #############################
     
@@ -257,7 +291,7 @@ def principal():
     graficador.graficarPuntos(matrizXc1);
     
     Y = AmontonadorKmedias(K, matrizXc1);
-    Y.iteradorKmeans(Y, 3)
+    Y.iteradorKmeans(Y, 5)
     
     
 principal()

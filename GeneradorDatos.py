@@ -4,8 +4,8 @@ import numpy
 
 class GeneradorDatos:
     """
-    @param media1, media de la dimension 1 (temperatura)
-    @param media2, media de la dimension 2 (humedad)
+    @param media1, media de la dimension 1
+    @param media2, media de la dimension 2 
     @param desv1, desviacion estandar de la dimension 1
     @param desv2, desviacion estandar de la dimension 2
     @param cantidadDatos, cantidad de muestras a generar aleatoriamente

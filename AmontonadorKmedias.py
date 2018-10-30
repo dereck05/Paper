@@ -33,12 +33,6 @@ class AmontonadorKmedias:
         #print("Punto maximoY: ", self.puntoMaximoY)
         self.__col = ["r","g","b","c","m","y","k"]
         
-        deltaX = numpy.linalg.norm(self.puntoMaximoX - self.puntoMenorX);
-        deltaY = numpy.linalg.norm(self.puntoMaximoY - self.puntoMenorY);
-        
-        
-    
-        
         self.__matrizCentroides = numpy.zeros((2 , K));
         self.__matrizPesos = numpy.zeros((self.__N, K))
         
@@ -48,7 +42,7 @@ class AmontonadorKmedias:
             self.__matrizCentroides[0, i] = puntoAleatorio[0];
             self.__matrizCentroides[1, i] = puntoAleatorio[1];
         
-        print("Centroides:",self.__matrizCentroides)
+        #print("Centroides:",self.__matrizCentroides)
     
     def getCentroides(self):
         return self.__matrizCentroides;
@@ -208,6 +202,7 @@ class AmontonadorKmedias:
         return centroidesNuevos
     
     def iteradorKmeans(self, Y , iteraciones):
+        
         #Encuentro el directorio en el que se está trabajando actualmente
         ruta = os.getcwd()
     
@@ -225,7 +220,7 @@ class AmontonadorKmedias:
             os.makedirs(x)
 
         
-        cont = 0
+        
         
         centroides = AmontonadorKmedias.getCentroides(Y)
         #Grafico los centroides
@@ -241,13 +236,13 @@ class AmontonadorKmedias:
         #Busco el segundo actual
         tiempo = time.strftime("%S")
         #Le asigno un nombre con extensión jpg a la imagen de resultado
-        rutaPrimera = os.path.join(x, "resultado" + str(tiempo) + ".jpg")
+        rutaPrimera = os.path.join(x, "resultado" + str(0) + ".jpg")
         #Salvo el gráfico como imagen
         plt.savefig(rutaPrimera)
         
         #Cierro el plot
         plt.close()
-        
+        cont = 0
         while(cont < iteraciones):
             Y.recalcularKmedias()
             centroides = AmontonadorKmedias.getCentroides(Y)
@@ -264,7 +259,7 @@ class AmontonadorKmedias:
             #Busco el segundo actual
             tiempo = time.strftime("%S")
             #Le asigno un nombre con extensión jpg a la imagen de resultado
-            rutaPrimera = os.path.join(x, "resultado" + str(tiempo) + ".jpg")
+            rutaPrimera = os.path.join(x, "resultado" + str(cont+1) + ".jpg")
             #Salvo el gráfico como imagen
             plt.savefig(rutaPrimera)
             
@@ -276,7 +271,7 @@ def principal():
     
     ############################## Cambiar parametros aqui para probarlo    Warning: puede dar error de zero division, solo vuelvalo a correr
     K = 3;  #cantidad de K-means
-    N = 400; #cantidad de datos
+    N = 100; #cantidad de datos
     
     #############################
     
@@ -286,6 +281,8 @@ def principal():
     graficador = Graficador();
     generadorDatos = GeneradorDatos();
     
+    start = time.time()
+    
     
     matrizXc1 = generadorDatos.generarDatosGauss2D(28, 3, 20, 10, N);
     graficador.graficarPuntos(matrizXc1);
@@ -293,7 +290,8 @@ def principal():
     Y = AmontonadorKmedias(K, matrizXc1);
     Y.iteradorKmeans(Y, 5)
     
-    
+    end = time.time()
+    print("time:",end - start)
 principal()
         
                 
